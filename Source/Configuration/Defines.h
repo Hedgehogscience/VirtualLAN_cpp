@@ -51,3 +51,6 @@
 #define _SCL_SECURE_NO_WARNINGS
 #define WIN32_LEAN_AND_MEAN
 #endif
+
+// Libtorrent / boost defines.
+#define _WIN32_WINNT 0x0501
