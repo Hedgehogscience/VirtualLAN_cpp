@@ -115,7 +115,6 @@ namespace VirtualLAN
                     Clientaddress.Address = ntohl(Client.sin_addr.s_addr);
                 }
             }
-
         }
     #else
         /* TODO(Convery): Nix implementation. */
