@@ -186,6 +186,7 @@
     <ClCompile Include="Source\Utilities\Binary\Patternscan.cpp" />
     <ClCompile Include="Source\Utilities\Data\Bytebuffer.cpp" />
     <ClCompile Include="Source\VirtualLAN\DHTManager.cpp" />
+    <ClCompile Include="Source\VirtualLAN\VLANManager.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="VirtualLAN_cpp.licenseheader" />
