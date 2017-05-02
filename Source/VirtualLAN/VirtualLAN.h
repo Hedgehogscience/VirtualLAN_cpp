@@ -10,6 +10,10 @@
 #include <vector>
 #include <memory>
 
+#ifdef _WIN32
+#include <winsock2.h>
+#endif
+
 namespace VirtualLAN
 {
     struct Networkaddress { uint32_t Address; uint16_t Port; };
@@ -32,7 +36,6 @@ namespace VirtualLAN
     namespace Internal
     {
     #ifdef _WIN32
-    #include <winsock2.h>
 
         SOCKET Socket{ INVALID_SOCKET };
         bool Initialized{ false };
