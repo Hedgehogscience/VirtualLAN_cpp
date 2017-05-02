@@ -38,28 +38,6 @@ namespace VirtualLAN
         bool Initialized{ false };
         uint16_t Port{ 28073 };
 
-        void Initialize()
-        {
-            WSADATA wsaData;
-            WSAStartup(MAKEWORD(2, 2), &wsaData);
-
-            Socket = socket(AF_INET, SOCK_DGRAM, 0);
-            if (Socket == INVALID_SOCKET) return;
-
-            BOOL Enabled = TRUE;
-            if (setsockopt(Socket, SOL_SOCKET, SO_BROADCAST, (char*)&Enabled, sizeof(BOOL)) < 0)
-                return;
-
-            sockaddr_in Address;
-            Address.sin_family = AF_INET;
-            Address.sin_port = htons(Port);
-            Address.sin_addr.s_addr = INADDR_ANY;
-
-            if (bind(Socket, (sockaddr*)&Address, sizeof(Address)) < 0)
-                return;
-
-            Initialized = true;
-        }
         void Send(std::string Data)
         {
             if (!Initialized) return;
@@ -72,8 +50,8 @@ namespace VirtualLAN
         }
         void Listen()
         {
-            auto Buffer = std::make_unique<char[]>(16 * 1024);
             int Recvlength = 0;
+            auto Buffer = std::make_unique<char[]>(16 * 1024);
 
             while (Initialized)
             {
@@ -100,6 +78,44 @@ namespace VirtualLAN
                     onPacket(Localpacket);
                 }
             }
+        }
+        void Initialize()
+        {
+            WSADATA wsaData;
+            WSAStartup(MAKEWORD(2, 2), &wsaData);
+
+            Socket = socket(AF_INET, SOCK_DGRAM, 0);
+            if (Socket == INVALID_SOCKET) return;
+
+            BOOL Enabled = TRUE;
+            if (setsockopt(Socket, SOL_SOCKET, SO_BROADCAST, (char*)&Enabled, sizeof(BOOL)) < 0)
+                return;
+
+            sockaddr_in Address;
+            Address.sin_family = AF_INET;
+            Address.sin_port = htons(Port);
+            Address.sin_addr.s_addr = INADDR_ANY;
+
+            if (bind(Socket, (sockaddr*)&Address, sizeof(Address)) < 0)
+                return;
+
+            Initialized = true;
+
+            // Initialize Clientaddress with our own address.
+            {
+                sockaddr_in Client;
+                int Clientlength = sizeof(Client);
+                auto Buffer = std::make_unique<char[]>(sizeof(Networkpacket));
+
+                VirtualLAN::Send("");
+                int Recvlength = recvfrom(Socket, Buffer.get(), sizeof(Networkpacket), 0, (sockaddr *)&Client, &Clientlength);
+                if (Recvlength == sizeof(Networkpacket))
+                {
+                    Clientaddress.Port = ntohs(Client.sin_port);
+                    Clientaddress.Address = ntohl(Client.sin_addr.s_addr);
+                }
+            }
+
         }
     #else
         /* TODO(Convery): Nix implementation. */
