@@ -21,13 +21,17 @@ namespace VirtualLAN
     struct Networkpacketwrapper : Networkpacket { Networkaddress Origin; std::string Payload; };
 
     // Helpers.
-    Networkaddress Clientaddress;
+    static Networkaddress Clientaddress;
     void Send(std::string Data);
 
     // Callback on incoming packets.
-    void onPacket(Networkpacketwrapper &Packet)
+    inline void onPacket(Networkpacketwrapper &Packet)
     {
         if (Packet.Type != Compiletimehash::FNV1a_32(MODULENAME)) return;
+
+        printf("Got data: %s\n", Packet.Payload.c_str());
+
+
         if (Packet.Origin.Address == Clientaddress.Address) return;
 
         /* Implement your own handler here using Packet.Payload */
@@ -37,11 +41,11 @@ namespace VirtualLAN
     {
     #ifdef _WIN32
 
-        SOCKET Socket{ INVALID_SOCKET };
-        bool Initialized{ false };
-        uint16_t Port{ 28073 };
+        static SOCKET Socket{ INVALID_SOCKET };
+        static bool Initialized{ false };
+        static uint16_t Port{ 28073 };
 
-        void Send(std::string Data)
+        inline void Send(std::string Data)
         {
             if (!Initialized) return;
 
@@ -51,7 +55,7 @@ namespace VirtualLAN
             Address.sin_addr.s_addr = inet_addr("255.255.255.255");
             sendto(Socket, Data.data(), Data.size(), 0, (sockaddr *)&Address, sizeof(Address));
         }
-        void Listen()
+        inline void Listen()
         {
             int Recvlength = 0;
             auto Buffer = std::make_unique<char[]>(16 * 1024);
@@ -82,7 +86,7 @@ namespace VirtualLAN
                 }
             }
         }
-        void Initialize()
+        inline void Initialize()
         {
             WSADATA wsaData;
             WSAStartup(MAKEWORD(2, 2), &wsaData);
@@ -125,7 +129,7 @@ namespace VirtualLAN
     #endif
     }
 
-    void Send(std::string Data)
+    inline void Send(std::string Data)
     {
         Networkpacket Packet;
         Packet.Length = Data.size();
