@@ -2,6 +2,8 @@
     Initial author: Convery
     Started: 2017-03-27
     License: MIT
+    
+    Not maintained anymore.
 */
 
 #include "StdInclude.h"
